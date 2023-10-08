@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/body.css">
+    <title>Star Wars</title>
+
+    
+</head>
+<body>
+    <section class="container">
+    <button id="play_button">PLAY</button>
+    <div id="point"><p>POINTS</p>
+    <p id="points">5</p></div>
+    
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <script src="./Bullet.js"></script>
+    <script src="./BulletController.js"></script>
+    <script src="./Enemy.js"></script>
+    <script src="./EnemyTie.js"></script>
+    <script src="./Player.js"></script>
+
+    <script>
+
+    const startButton = document.getElementById("play_button");
+    startButton.addEventListener("click", startGame);
+
+    function startGame(){
+    
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const playerBulletController = new BulletController(canvas,true); 
+        const enemyBulletController = new BulletController(canvas,false); /*false to unable the sound for enemy bullets*/
+        const player = new Player(canvas, 3, playerBulletController);
+
+        const enemies = [
+            new Enemy(canvas,100,50, "red"), 
+            new Enemy(canvas,150,150, "red"),
+            new EnemyTie(canvas,375,250, 5, enemyBulletController),
+            new Enemy(canvas,200,50, "red"),
+            new Enemy(canvas,250,150, "red"),
+            new Enemy(canvas,300,50, "red"),
+            new Enemy(canvas,350,150, "red"),
+            new Enemy(canvas,400,50, "red"),
+            new Enemy(canvas,450,150, "red"),
+            new Enemy(canvas,500,50, "red"),
+            new Enemy(canvas,550,150, "red"),
+            new Enemy(canvas,600,50, "red")  ,
+            new Enemy(canvas,650,150, "red"),
+            new Enemy(canvas,700,50, "red"),
+            new Enemy(canvas,800,50, "red"),
+        ];
+
+        let points = 5;
+
+
+        function play(){
+            ctx.clearRect(0,0,canvas.width,canvas.height); /*to clear the canvas, to avoid repetion*/
+            requestAnimationFrame(play); /*to block the image*/
+            
+            player.draw(ctx);
+            playerBulletController.draw(ctx);
+            enemyBulletController.draw(ctx);
+            
+            enemies.forEach((enemy)=>{
+                if (playerBulletController.collideWith(enemy)){ /*check collision between enemy and player bullet*/
+                    if (enemy.health <=0 ) {
+                        const index = enemies.indexOf(enemy);
+                        enemies.splice(index,1); /*remove from array the dead enemy*/
+                        points++;
+                        document.getElementById('points').innerHTML = points;
+                    }
+
+                } else {
+                    enemy.draw(ctx); /* draw the enemies on the screen if health > 0*/
+                }
+                
+            });
+            if(enemyBulletController.collideWith(player)) { /*check collision between player and enemy bullet*/
+                    points--;
+                    document.getElementById('points').innerHTML = points;
+                    if(points <= 0){
+                        alert("Game is over\nScore: 0.");
+                        location.reload(true); /* to restart*/
+                    }
+            }
+            
+        
+        
+        }
+        
+        play();
+
+    }
+
+                
+    
+    </script>
+</section>
+
+</body>
+</html>
